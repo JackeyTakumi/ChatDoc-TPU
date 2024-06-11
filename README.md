@@ -66,6 +66,7 @@ pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
     |-- embedding         -- 文本嵌入模型
     |-- docs              -- 环境安装文档
     |-- static            -- README中图片文件
+    |-- api.py            -- API服务脚本
     |-- README.md         -- README
     |-- config.ini        -- 推理模型配置文件
     |-- requirements.txt  -- 项目依赖
@@ -97,6 +98,11 @@ usage: ./run.sh [--model MODEL]  [--dev_id DEV_ID] [--server_address SERVER_ADDR
 >2. dev_id 需设置为 BM1684X 设备id
 >3. 默认使用 2k seq_len 模型，如果需要其他参数的模型，可参考[ChatGLM3模型导出与编译](https://github.com/sophgo/sophon-demo/blob/release/sample/ChatGLM3/docs/ChatGLM3_Export_Guide.md)和[Qwen模型导出与编译](https://github.com/sophgo/sophon-demo/blob/release/sample/Qwen/docs/Qwen_Export_Guide.md)
 >4. embedding 模型默认使用 [shibing624/text2vec-bge-large-chinese](https://huggingface.co/shibing624/text2vec-bge-large-chinese)，导出模型方法可参考 [export_onnx.py](./scripts/export_onnx.py)
+
+如果您只想启动以后后端api接口，可以在下载完毕模型之后，运行
+```bash
+python api.py
+```
 
 ## 操作说明
 
