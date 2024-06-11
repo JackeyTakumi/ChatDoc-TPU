@@ -5,12 +5,8 @@
 - [介绍](#介绍)
 - [特点](#特点)
 - [安装](#安装)
-  - [克隆代码:](#克隆代码)
-  - [进入项目路径:](#进入项目路径)
   - [安装第三方库](#安装第三方库)
   - [安装sail](#安装sail)
-    - [x86/arm PCIe平台](#x86arm-pcie平台)
-    - [SoC平台](#soc平台)
 - [项目结构树](#项目结构树)
 - [启动](#启动)
 - [操作说明](#操作说明)
@@ -20,7 +16,7 @@
   - [导入知识库](#导入知识库)
   - [删除知识库](#删除知识库)
   - [重命名知识库](#重命名知识库)
-  - [清楚聊天记录](#清楚聊天记录)
+  - [清除聊天记录](#清除聊天记录)
   - [移除选中文档](#移除选中文档)
 
 
@@ -28,7 +24,7 @@
 
 该项目的主要目标是通过使用自然语言来简化与文档的交互，并提取有价值的信息。此项目使用LangChain、[ChatGLM3-TPU](https://github.com/sophgo/sophon-demo/tree/release/sample/ChatGLM3)或[QWEN-TPU](https://github.com/sophgo/sophon-demo/tree/release/sample/Qwen)构建，以向用户提供流畅自然的对话体验。
 
-以 ChatGPT 为例（可替换为其他LLM，本仓库已支持 Chatglm3 和 Qwen，需要保证接口一致），本地知识库问答流程如下：
+以 ChatGPT 为例（可替换为其他LLM，本仓库已支持 Chatglm3-6B 和 Qwen-7B，需要保证接口一致），本地知识库问答流程如下：
 ![Flow](<./static/embedding.png>)
 
 ## 特点
@@ -43,62 +39,15 @@
 
 按照以下步骤，可以将这个项目部署到SophGo的设备上
 
-### 克隆代码:
-```bash
-git clone https://github.com/wangyifan2018/ChatDoc-TPU.git
-```
-### 进入项目路径:
-```bash
-cd ChatDoc-TPU
-```
 ### 安装第三方库
 ```bash
-# 考虑到 langchain 和 sail 版本依赖，推荐在 python>=3.9 环境运行
-# 已在 python==3.9 环境测试通过
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+cd ChatDoc-TPU
+# 考虑到 langchain 和 sail 版本依赖，推荐在 python>=3.8 环境运行
+pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 ### 安装sail
-#### x86/arm PCIe平台
 
-如果您在x86/arm平台安装了PCIe加速卡（如SC系列加速卡），并使用它测试本例程，您需要安装libsophon，具体请参考[x86-pcie平台的开发和运行环境搭建](./docs/Environment_Install_Guide.md#3-x86-pcie平台的开发和运行环境搭建)或[arm-pcie平台的开发和运行环境搭建](./docs/Environment_Install_Guide.md#5-arm-pcie平台的开发和运行环境搭建)。
-
-Sail的安装可以参考[sophon-sail编译安装指南](https://doc.sophgo.com/sdk-docs/v23.07.01/docs_latest_release/docs/sophon-sail/docs/zh/html/1_build.html#)自己编译sophon-sail。
-```bash
-pip install dfss -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade
-python3 -m dfss --url=open@sophgo.com:sophon-demo/ChatGLM3/sail/sophon-sail_20240226.tar.gz
-tar xvf sophon-sail_20240226.tar.gz
-```
-下载SOPHON-SAIL源码,解压后进入其源码目录，编译不包含bmcv,sophon-ffmpeg,sophon-opencv的SAIL, 通过此方式编译出来的SAIL无法使用其Decoder、Bmcv等多媒体相关接口。
-
-创建编译文件夹build,并进入build文件夹
-```bash
-cd sophon-sail
-mkdir build && cd build
-```
-执行编译命令
-
-```bash
-cmake -DONLY_RUNTIME=ON ..
-make pysail
-```
-打包生成python wheel,生成的wheel包的路径为‘python/pcie/dist’,文件名为‘sophon-3.7.0-py3-none-any.whl’
-```bash
-cd ../python/pcie
-chmod +x sophon_pcie_whl.sh
-./sophon_pcie_whl.sh
-```
-安装python wheel
-
-```bash
-pip install ./dist/sophon-3.7.0-py3-none-any.whl --force-reinstall
-```
-
-#### SoC平台
-
-如果您使用SoC平台（如SE、SM系列边缘设备），并使用它测试本例程，刷机后在`/opt/sophon/`下已经预装了相应的libsophon、sophon-opencv和sophon-ffmpeg运行库包。
-
-如果您需要其他版本的sophon-sail，可以参考上一小节，下载源码自己编译，参考[sail交叉编译方法](https://doc.sophgo.com/sdk-docs/v23.07.01/docs_latest_release/docs/sophon-sail/docs/zh/html/1_build.html#id5)。
-
+此例程`依赖新版本sail`，旧版本需要更新，安装方法请参考[Sail_Install_Guide](./docs/Sail_Install_Guide.md)
 
 ## 项目结构树
 ```
@@ -114,7 +63,8 @@ pip install ./dist/sophon-3.7.0-py3-none-any.whl --force-reinstall
         |-- chatbot.py    -- ChatDoc业务逻辑脚本
         |-- charglm3      -- charglm3 代码
         |-- qwen          -- qwen 代码
-    |-- embedding_tpu     -- 文本嵌入模型TPU版本
+    |-- embedding         -- 文本嵌入模型
+    |-- docs              -- 环境安装文档
     |-- static            -- README中图片文件
     |-- api.py            -- API服务脚本
     |-- README.md         -- README
@@ -126,17 +76,28 @@ pip install ./dist/sophon-3.7.0-py3-none-any.whl --force-reinstall
 
 ## 启动
 
-回到`ChatDoc-TPU`主目录，启动程序，模型和配置文件自动下载
+回到`ChatDoc-TPU`主目录，启动程序，模型和配置文件自动下载，使用默认路径
 
-| Model           | SoC                                |
-| :-------------- | :--------------------------------- |
-| ChatGLM3-6B     | bash ./run.sh --model chatglm3     |
-| Qwen-7B         | bash ./run.sh --model qwen         |
+| Model           | Cmd                                  |
+| :-------------- | :------------------------------------|
+| ChatGLM3-6B     | ./run.sh --model chatglm3 --dev_id 0 |
+| Qwen-7B         | ./run.sh --model qwen --dev_id 0     |
 
-- 在 `config.ini` 中设置默认模型地址、dev_id
-- 默认 dev_id=0，需要修改为 BM1684X 设备的 dev_id
+```bash
+usage: ./run.sh [--model MODEL]  [--dev_id DEV_ID] [--server_address SERVER_ADDRESS] [--server_port SERVER_PORT]
+--model: 选择模型，可选项为 chatglm3/qwen。默认为 "chatglm3"。
+--dev_id: 用于推理的 TPU 设备 ID。默认为 0。
+--server_address: web server 地址。默认为 "0.0.0.0"。
+--server_port：web sever 端口。如不设置，从 8501 起自动分配。
+```
 
-默认使用 2k seq_len 模型，如果需要其他参数的模型，可参考[ChatGLM3模型导出与编译](https://github.com/sophgo/sophon-demo/blob/release/sample/ChatGLM3/docs/ChatGLM3_Export_Guide.md)和[Qwen模型导出与编译](https://github.com/sophgo/sophon-demo/blob/release/sample/Qwen/docs/Qwen_Export_Guide.md)
+启动后您可以通过浏览器打开，`URL: http://{host_ip}:8501`，host_ip为启动ChatDoc的设备IP，或者您通过参数设置的`server_address`
+
+> **说明**：
+>1. 在 `config.ini` 中可修改模型路径，默认使用int4模型
+>2. dev_id 需设置为 BM1684X 设备id
+>3. 默认使用 2k seq_len 模型，如果需要其他参数的模型，可参考[ChatGLM3模型导出与编译](https://github.com/sophgo/sophon-demo/blob/release/sample/ChatGLM3/docs/ChatGLM3_Export_Guide.md)和[Qwen模型导出与编译](https://github.com/sophgo/sophon-demo/blob/release/sample/Qwen/docs/Qwen_Export_Guide.md)
+>4. embedding 模型默认使用 [shibing624/text2vec-bge-large-chinese](https://huggingface.co/shibing624/text2vec-bge-large-chinese)，导出模型方法可参考 [export_onnx.py](./scripts/export_onnx.py)
 
 如果您只想启动以后后端api接口，可以在下载完毕模型之后，运行
 ```bash
@@ -148,7 +109,7 @@ python api.py
 ![UI](<./static/img1.png>)
 
 ### 界面简介
-ChatDoc由控制区和聊天对话区组成。控制区用于管理文档和知识库，聊天对话区用于输入消息接受消息。
+ChatDoc由控制区和聊天对话区组成。控制区用于管理文档和知识库，聊天对话区用于输入和接受消息。
 
 上图中的10号区域是 ChatDoc 当前选中的文档。若10号区域为空，即 ChatDoc 没有选中任何文档，仍在聊天对话区与 ChatDoc 对话，则此时的 ChatDoc 是一个单纯依托 LLM 的 ChatBot。
 
@@ -156,26 +117,26 @@ ChatDoc由控制区和聊天对话区组成。控制区用于管理文档和知�
 点击`1`选择要上传的文档，然后点击按钮`4`构建知识库。随后将embedding文档，完成后将被选中，并显示在10号区域，接着就可开始对话。我们可重复上传文档，embedding成功的文档均会进入10号区域。
 
 ### 持久化知识库
-10号区域选中的文档在用户刷新或者关闭页面时，将会清空，而如何能保存这些已经embedding的文档，我们可以持久化知识库，在下次进入无需embedding计算即可加载知识库。具体做法是，在10号区域不为空的情况下，点击按钮`5`即可持久化知识库，知识库的名称是所有文档名称以逗号连接而成。
+10号区域选中的文档在用户刷新或者关闭页面时，将会清空。若用户需要保存这些已经embedding的文档，可以选择持久化知识库，下次进入时无需embedding计算即可加载知识库。具体做法是，在10号区域不为空的情况下，点击按钮`5`即可持久化知识库，知识库的名称是所有文档名称以逗号连接而成。
 
 ### 导入知识库
 
-进入ChatDoc我们可以从选择框`2`查看目前以持久化的知识库，选中我们需要加载的知识库后，点击按钮`3`导入知识库。完成后即可开始对话。注意cpu版的知识库和tpu版的知识库不能混用，若启动tpu版程序，则不能加载已持久化的cpu版知识库，若启动cpu版程序，则不能加载已持久化的tpu版知识库。
+用户可以从选择框`2`查看目前已持久化的知识库。选中我们需要加载的知识库后，点击按钮`3`导入知识库。完成后即可开始对话。注意cpu版的知识库和tpu版的知识库不能混用，若启动tpu版程序，则不能加载已持久化的cpu版知识库；若启动cpu版程序，则不能加载已持久化的tpu版知识库。
 
 ### 删除知识库
 
-当我们需要删除本地已经持久化的知识库时，我们可从选择框`2`选择我们要删除的知识库，然后点击按钮`6`删除知识库。
+当用户需要删除本地已经持久化的知识库时，可从选择框`2`选择要删除的知识库，然后点击按钮`6`删除知识库。
 
 ### 重命名知识库
 
 ![Rename](<./static/img2.png>)
 
-由于知识库的命名是由其文档的名称组合而来，难免造成知识库名称过长的问题，ChatDoc提供了一个修改知识库名称的功能，选择框`2`选择我们要修改的知识库，然后点击按钮`9`重命名知识库，随后ChatDoc将弹出一个输入框和一个确认按钮，如上图。在输出框输入我们修改至的名称，然后点击确认重命名按钮。
+由于知识库的命名是由其文档的名称组合而来，难免造成知识库名称过长的问题。ChatDoc提供了一个修改知识库名称的功能，选择框`2`选择我们要修改的知识库，然后点击按钮`9`重命名知识库，随后ChatDoc将弹出一个输入框和一个确认按钮，如上图。在输出框输入修改后的名称，然后点击`确认重命名`按钮。
 
-### 清楚聊天记录
+### 清除聊天记录
 
-点击按钮`7`即可清楚聊天对话区聊天记录。其他不受影响。
+点击按钮`7`即可清除聊天对话区聊天记录。其他不受影响。
 
 ### 移除选中文档
 
-点击按钮`8`将清空10号区域，同时清楚聊天记录。
+点击按钮`8`将清空10号区域，同时清除聊天记录。

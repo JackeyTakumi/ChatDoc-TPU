@@ -27,3 +27,5 @@ models/
 *.pdf
 
 sophon-sail/
+python_wheels/
+*.whl
