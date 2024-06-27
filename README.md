@@ -59,8 +59,6 @@ pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
         |-- uploaded      -- 已上传文件目录
     |-- models
         |-- bert_model    -- BERT 模型
-        |-- glm3_model    -- charglm3-6B 模型
-        |-- qwen_model    -- qwen-7B 模型
     |-- chat
         |-- chatbot.py    -- ChatDoc业务逻辑脚本
         |-- charglm3      -- charglm3 代码
@@ -78,15 +76,12 @@ pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ## 启动
 
 回到`ChatDoc-TPU`主目录，启动程序，模型和配置文件自动下载，使用默认路径
-
-| Model           | Cmd                                  |
-| :-------------- | :------------------------------------|
-| ChatGLM3-6B     | ./run.sh --model chatglm3 --dev_id 0 |
-| Qwen-7B         | ./run.sh --model qwen7b --dev_id 0     |
+```bash
+./run.sh --dev_id 0
+```
 
 ```bash
-usage: ./run.sh [--model MODEL]  [--dev_id DEV_ID] [--server_address SERVER_ADDRESS] [--server_port SERVER_PORT]
---model: 选择模型，可选项为 chatglm3/qwen。默认为 "chatglm3"。
+usage: ./run.sh  [--dev_id DEV_ID] [--server_address SERVER_ADDRESS] [--server_port SERVER_PORT]
 --dev_id: 用于推理的 TPU 设备 ID。默认为 0。
 --server_address: web server 地址。默认为 "0.0.0.0"。
 --server_port：web sever 端口。如不设置，从 8501 起自动分配。

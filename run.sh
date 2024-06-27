@@ -12,7 +12,7 @@ fi
 pip3 install dfss -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade
 
 # default param
-llm_model="chatglm3"
+llm_model="chatglm3-6b"
 dev_id="0"
 server_address="0.0.0.0"
 server_port=""
@@ -23,10 +23,6 @@ parse_args() {
         key="$1"
 
         case $key in
-            --model)
-                llm_model="$2"
-                shift 2
-                ;;
             --dev_id)
                 dev_id="$2"
                 shift 2
@@ -76,32 +72,6 @@ if [ ! -d "./models/bert_model" ]; then
     echo "bert_model download!"
 else
     echo "$HOME/nltk_dat already exist..."
-fi
-
-# download LLM models
-if [ "$llm_model" == "chatglm3" ]; then
-    if [ ! -d "./models/glm3_model" ]; then
-        echo "./models/glm3_model does not exist, download..."
-        python3 -m dfss --url=open@sophgo.com:ezoo/chatdoc/glm3_model.tar.gz
-        tar -zxvf glm3_model.tar.gz -C ./models
-        rm glm3_model.tar.gz
-        echo "glm3_model download!"
-    else
-        echo "./models/glm3_model already exist..."
-    fi
-elif [ "$llm_model" == "qwen7b" ]; then
-    if [ ! -d "./models/qwen_model" ]; then
-        echo "./models/qwen_model does not exist, download...."
-        python3 -m dfss --url=open@sophgo.com:ezoo/chatdoc/qwen_model.tar.gz
-        tar -zxvf qwen_model.tar.gz -C ./models
-        rm qwen_model.tar.gz
-        echo "qwen_model download!"
-    else
-        echo "./models/qwen_model already exist..."
-    fi
-else
-    echo "Error: --model is not recognized. Must be 'chatglm3' or 'qwen'."
-    exit 1
 fi
 
 

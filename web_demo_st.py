@@ -8,12 +8,18 @@ import logging
 sys.path.append(".")
 sys.path.append(os.path.join(os.path.dirname(__file__), 'doc_processor'))
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+from openai import OpenAI
+import configparser
+config = configparser.ConfigParser()
+config.read('config.ini')
 
+supported_model = config.get("init_config","supported_model").split(',')
+base_url = config.get("init_config", "base_url")
+client = OpenAI(api_key="EMPTY", base_url=base_url)
 
 @st.cache_resource
 def load_model():
     return DocChatbot.get_instance()
-
 
 chatbot_st = load_model()
 
@@ -44,13 +50,14 @@ def cut_history(u_input):
 
     return history
 
-
 with st.sidebar:
     st.title("💬 ChatDoc-TPU")
+    selected_model = st.selectbox("Select Model", supported_model, index=supported_model.index(chatbot_st.llm))
+    if selected_model:
+        chatbot_st.llm = selected_model
     st.write("上传一个文档，然后与我对话.")
     with st.form("Upload and Process", True):
-        uploaded_file = st.file_uploader("上传文档", type=None, accept_multiple_files=True, help = "目前支持多种文件格式，包括pdf、ppt、html、图片、表格等"
-                                         )
+        uploaded_file = st.file_uploader("上传文档", type=["pdf", "txt", "docx", "pptx", 'png', 'jpg', 'jpeg', 'bmp'], accept_multiple_files=True, help = "目前支持多种文件格式，包括pdf、pptx、图片等")
 
         option = st.selectbox(
             "选择已保存的知识库",
@@ -175,8 +182,18 @@ if user_input := st.chat_input():
         st.chat_message("user").write(user_input)
         with st.chat_message("assistant"):
             answer_container = st.empty()
-            for result_answer, _ in chatbot_st.llm.stream_predict(user_input, his):
-                answer_container.markdown(result_answer)
+            messages = [{"role": "user", "content": user_input}]
+            response = client.chat.completions.create(
+                                model=chatbot_st.llm,
+                                messages=messages,
+                                stream=True)
+            result_answer = ''
+            if response:
+                for chunk in response:
+                    if chunk.choices[0].delta.content:
+                        result_answer += chunk.choices[0].delta.content
+                        answer_container.markdown(result_answer)
+                        print(chunk.choices[0].delta.content, flush=True, end='')
         st.session_state["messages"].append({"role": "assistant", "content": result_answer})
     else:
         st.session_state["messages"].append({"role": "user", "content": user_input})
@@ -189,9 +206,18 @@ if user_input := st.chat_input():
             refer = "\n".join([x.page_content.replace("\n", '\t') for x in docs])
             PROMPT = """{}。\n请根据下面的参考文档回答上述问题。\n{}\n"""
             prompt = PROMPT.format(user_input, refer)
-
-            for result_answer, _ in chatbot_st.llm.stream_predict(prompt, []):
-                answer_container.markdown(result_answer)
+            messages = [{"role": "user", "content": prompt}]
+            response = client.chat.completions.create(
+                                model=chatbot_st.llm,
+                                messages=messages,
+                                stream=True)
+            result_answer = ''
+            if response:
+                for chunk in response:
+                    if chunk.choices[0].delta.content:
+                        result_answer += chunk.choices[0].delta.content
+                        answer_container.markdown(result_answer)
+                        print(chunk.choices[0].delta.content, flush=True, end='')
 
             with st.expander("References"):
                 for i, doc in enumerate(docs):
