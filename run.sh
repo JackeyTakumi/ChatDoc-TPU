@@ -12,8 +12,8 @@ fi
 pip3 install dfss -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade
 
 # default param
-llm_model="chatglm3-6b"
-dev_id="0"
+llm_model="qwen7b"
+dev_id=0
 server_address="0.0.0.0"
 server_port=""
 
@@ -71,7 +71,18 @@ if [ ! -d "./models/bert_model" ]; then
     rm bert_model.zip
     echo "bert_model download!"
 else
-    echo "$HOME/nltk_dat already exist..."
+    echo "bert_model already exist..."
+fi
+
+# download reranker
+if [ ! -d "./models/reranker_model" ]; then
+    echo "./models/reranker_model does not exist, download..."
+    python3 -m dfss --url=open@sophgo.com:ezoo/chatdoc/reranker_model.zip
+    unzip reranker_model.zip -d ./models
+    rm reranker_model.zip
+    echo "reranker_model download!"
+else
+    echo "reranker_model already exist..."
 fi
 
 

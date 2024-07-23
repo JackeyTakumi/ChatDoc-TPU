@@ -52,12 +52,14 @@ def cut_history(u_input):
 
 with st.sidebar:
     st.title("💬 ChatDoc-TPU")
-    selected_model = st.selectbox("Select Model", supported_model, index=supported_model.index(chatbot_st.llm))
+    selected_model = st.selectbox("选择大语言模型", supported_model, index=supported_model.index(chatbot_st.llm))
     if selected_model:
         chatbot_st.llm = selected_model
+
     st.write("上传一个文档，然后与我对话.")
     with st.form("Upload and Process", True):
         uploaded_file = st.file_uploader("上传文档", type=["pdf", "txt", "docx", "pptx", 'png', 'jpg', 'jpeg', 'bmp'], accept_multiple_files=True, help = "目前支持多种文件格式，包括pdf、pptx、图片等")
+        print("uploaded_file:", uploaded_file)
 
         option = st.selectbox(
             "选择已保存的知识库",
@@ -69,7 +71,9 @@ with st.sidebar:
         with col1:
             import_repository = st.form_submit_button("导入知识库")
         with col2:
+            print("############################")
             add_repository = st.form_submit_button("添加知识库")
+            print("add_repository: ", add_repository)
         col3, col4 = st.columns(2)
         with col3:
             save_repository = st.form_submit_button("保存知识库")
@@ -172,7 +176,6 @@ if 'messages' in st.session_state:
         st.chat_message(msg["role"]).write(msg["content"])
 
 if user_input := st.chat_input():
-    # import pdb;pdb.set_trace()
     if 'files' not in st.session_state:
         his = cut_history(user_input)
         if 'messages' not in st.session_state:
@@ -202,6 +205,10 @@ if user_input := st.chat_input():
             answer_container = st.empty()
             start_time = time.time()
             docs = chatbot_st.query_from_doc(user_input, 3)
+            ### reranker
+            if chatbot_st.use_reranker:
+                docs = chatbot_st.reranker.compress_documents(documents=docs, query=user_input)
+                logging.info("using reranker now!!!!")
             logging.info("Total quire time {}".format(time.time()- start_time))
             refer = "\n".join([x.page_content.replace("\n", '\t') for x in docs])
             PROMPT = """{}。\n请根据下面的参考文档回答上述问题。\n{}\n"""

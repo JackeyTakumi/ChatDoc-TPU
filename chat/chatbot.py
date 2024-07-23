@@ -23,6 +23,7 @@ from glob import glob
 from tqdm import tqdm
 
 from embedding import Word2VecEmbedding
+from reranker import RerankerTPU, LangchainReranker
 import doc_processor
 from doc_processor.knowledge_file import KnowledgeFile
 
@@ -34,6 +35,7 @@ class DocChatbot:
 
     def __init__(self) -> None:
         self.llm = os.getenv("LLM_MODEL")
+        self.use_reranker = True
         dev_id = 0
         if os.getenv("DEVICE_ID"):
             dev_id = int(os.getenv("DEVICE_ID"))
@@ -48,6 +50,8 @@ class DocChatbot:
         # embeddings_size hard code here, can read from model output size
         self.embeddings_size = 1024
         self.embeddings = Word2VecEmbedding()
+        # self.reranker = LangchainReranker(top_n=3, device='cpu', max_length=1024, model_name_or_path="../bge-reranker-large")
+        self.reranker = RerankerTPU()
         logging.info("chatbot init success!")
 
     def docs2embedding(self, docs):
