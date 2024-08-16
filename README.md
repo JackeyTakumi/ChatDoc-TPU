@@ -1,6 +1,6 @@
 # ChatDoc-TPU <!-- omit in toc -->
 
-这个项目是基于 Sophgo TPU 实现的文档对话工具。项目可在 BM1684X 上独立部署运行。
+这个项目是基于 Sophgo TPU 实现的文档对话工具。项目可在 BM1684X，BM1688 上独立部署运行。
 
 - [介绍](#介绍)
 - [特点](#特点)
@@ -44,8 +44,8 @@
 cd ChatDoc-TPU
 # 考虑到 langchain 和 sail 版本依赖，推荐在 python>=3.8 环境运行
 sudo apt update
-sudo apt install libgl1-mesa-glx
-pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+sudo apt install libgl1-mesa-glx libcairo2-dev
+pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple && pip3 uninstall torchvision
 ```
 ### 安装sail
 
@@ -81,19 +81,21 @@ pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ```bash
-usage: ./run.sh  [--dev_id DEV_ID] [--server_address SERVER_ADDRESS] [--server_port SERVER_PORT]
+usage: ./run.sh  [--dev_id DEV_ID] [--server_address SERVER_ADDRESS] [--server_port SERVER_PORT] [--chip CHIP]
 --dev_id: 用于推理的 TPU 设备 ID。默认为 0。
 --server_address: web server 地址。默认为 "0.0.0.0"。
 --server_port：web sever 端口。如不设置，从 8501 起自动分配。
+--chip：需要下载模型对应的芯片类型。如不设置，默认为bm1684x。
 ```
 
 启动后您可以通过浏览器打开，`URL: http://{host_ip}:8501`，host_ip为启动ChatDoc的设备IP，或者您通过参数设置的`server_address`
 
 > **说明**：
 >1. 在 `config.ini` 中可修改模型路径，默认使用int4模型
->2. dev_id 需设置为 BM1684X 设备id
+>2. dev_id 需设置为 SophGo 设备id
 >3. 默认使用 2k seq_len 模型，如果需要其他参数的模型，可参考[ChatGLM3模型导出与编译](https://github.com/sophgo/sophon-demo/blob/release/sample/ChatGLM3/docs/ChatGLM3_Export_Guide.md)和[Qwen模型导出与编译](https://github.com/sophgo/sophon-demo/blob/release/sample/Qwen/docs/Qwen_Export_Guide.md)
 >4. embedding 模型默认使用 [shibing624/text2vec-bge-large-chinese](https://huggingface.co/shibing624/text2vec-bge-large-chinese)，导出模型方法可参考 [export_onnx.py](./scripts/export_onnx.py)
+>5. SE9设备运行本项目需要16GB内存版本。
 
 ## 操作说明
 
