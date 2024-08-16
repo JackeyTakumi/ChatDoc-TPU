@@ -13,11 +13,8 @@ import time
 import numpy as np
 from datetime import datetime
 import faiss
-from langchain.document_loaders import UnstructuredPowerPointLoader, UnstructuredWordDocumentLoader, \
-    UnstructuredPDFLoader, UnstructuredFileLoader
 import logging
 import pickle
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List
 from glob import glob
 from tqdm import tqdm
