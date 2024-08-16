@@ -47,11 +47,17 @@ class RapidOCRDocLoader(UnstructuredFileLoader):
                         for img_id in image.xpath('.//a:blip/@r:embed'):  # 获取图片id
                             part = doc.part.related_parts[img_id]  # 根据图片id获取对应的图片
                             if isinstance(part, ImagePart):
-                                image = Image.open(BytesIO(part._blob))
-                                result, _ = ocr(np.array(image))
-                                if result:
-                                    ocr_result = [line[1] for line in result]
-                                    resp += "\n".join(ocr_result)
+                                try:  
+                                    image = Image.open(BytesIO(part._blob))  
+                                    result, _ = ocr(np.array(image))  
+                                    if result:  
+                                        ocr_result = [line[1] for line in result]  
+                                        resp += "\n".join(ocr_result)  
+                                except OSError as e:  
+                                    if "cannot find loader for this WMF file" in str(e):  
+                                        print("跳过WMF文件处理:", e)  
+                                    else:  
+                                        raise  # 重新抛出其他类型的错误
                 elif isinstance(block, Table):
                     for row in block.rows:
                         for cell in row.cells:
