@@ -20,7 +20,7 @@ from glob import glob
 from tqdm import tqdm
 
 from embedding import Word2VecEmbedding
-from reranker import RerankerTPU, LangchainReranker
+from reranker import RerankerTPU
 import doc_processor
 from doc_processor.knowledge_file import KnowledgeFile
 

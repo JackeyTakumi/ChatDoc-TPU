@@ -18,3 +18,5 @@ openai
 langchain_core==0.1.23
 sentence_transformers
 llama_index==0.9.35
+langsmith==0.0.87
+langchain-community==0.0.20

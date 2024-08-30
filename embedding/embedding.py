@@ -7,12 +7,11 @@
 # third-party components.
 #
 #===----------------------------------------------------------------------===#
-from langchain.embeddings.base import Embeddings
 from typing import List
 from .sentence_model import SentenceModel
 
 
-class Word2VecEmbedding(Embeddings):
+class Word2VecEmbedding():
     model = SentenceModel()
 
     def embed_query(self, text: str) -> List[float]:
